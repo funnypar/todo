@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:todo/data.dart';
+import 'package:todo/edit.dart';
 
 const taskBoxName = 'tasks';
 Future<void> main() async {
@@ -65,9 +66,11 @@ class HomeScreen extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (context) => EditTaskScreen()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EditTaskScreen(task: Task()),
+            ),
+          );
         },
         label: Row(
           children: [
@@ -250,43 +253,6 @@ class _TaskItemState extends State<TaskItem> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class EditTaskScreen extends StatelessWidget {
-  EditTaskScreen({super.key});
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Edit Task')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          final task = Task();
-          task.name = _controller.text;
-          if (task.isInBox) {
-            // Update
-            task.save();
-          } else {
-            // Save New Item
-            final Box<Task> box = Hive.box(taskBoxName);
-            box.add(task);
-          }
-          // Close the page
-          Navigator.of(context).pop();
-        },
-        label: Text('Save Cahnges'),
-      ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(label: Text('Add a task for today...')),
-          ),
-        ],
       ),
     );
   }

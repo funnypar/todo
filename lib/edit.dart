@@ -5,7 +5,7 @@ import 'package:todo/data.dart';
 import 'package:todo/main.dart';
 
 class EditTaskScreen extends StatefulWidget {
-  EditTaskScreen({super.key, required this.task});
+  const EditTaskScreen({super.key, required this.task});
 
   final Task task;
 
@@ -28,17 +28,14 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          final task = Task();
-          task.name = _controller.text;
-          if (task.isInBox) {
-            // Update
-            task.save();
+          widget.task.name = _controller.text;
+
+          if (widget.task.isInBox) {
+            widget.task.save();
           } else {
-            // Save New Item
-            final Box<Task> box = Hive.box(taskBoxName);
-            box.add(task);
+            Hive.box<Task>(taskBoxName).add(widget.task);
           }
-          // Close the page
+
           Navigator.of(context).pop();
         },
         label: Row(
@@ -60,7 +57,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   flex: 1,
                   child: PeriorityRadioBox(
                     label: 'High',
-                    iconColor: primaryColor,
+                    iconColor: hightPriority,
                     isSelected: widget.task.priority == Priority.high,
                     onTap: () => setState(() {
                       widget.task.priority = Priority.high;
@@ -72,7 +69,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   flex: 1,
                   child: PeriorityRadioBox(
                     label: 'Normal',
-                    iconColor: Colors.orange,
+                    iconColor: normalPriority,
                     isSelected: widget.task.priority == Priority.normal,
                     onTap: () => setState(() {
                       widget.task.priority = Priority.normal;
@@ -84,7 +81,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   flex: 1,
                   child: PeriorityRadioBox(
                     label: 'Low',
-                    iconColor: Colors.blue,
+                    iconColor: lowPriority,
                     isSelected: widget.task.priority == Priority.low,
                     onTap: () => setState(() {
                       widget.task.priority = Priority.low;

@@ -243,6 +243,7 @@ class _TaskItemState extends State<TaskItem> {
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     final Color priorityColor;
+
     switch (widget.task.priority) {
       case Priority.low:
         priorityColor = lowPriority;
@@ -262,6 +263,9 @@ class _TaskItemState extends State<TaskItem> {
           ),
         );
       }),
+      onLongPress: () {
+        widget.task.delete();
+      },
       child: Container(
         height: 84,
         margin: EdgeInsets.only(top: 8),

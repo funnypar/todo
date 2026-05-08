@@ -14,7 +14,9 @@ class EditTaskScreen extends StatefulWidget {
 }
 
 class _EditTaskScreenState extends State<EditTaskScreen> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.task.name,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           widget.task.name = _controller.text;
-
           if (widget.task.isInBox) {
             widget.task.save();
           } else {

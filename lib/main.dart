@@ -234,7 +234,11 @@ class _TaskItemState extends State<TaskItem> {
     }
     return InkWell(
       onTap: () => setState(() {
-        widget.task.isCompleted = !widget.task.isCompleted;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EditTaskScreen(task: widget.task),
+          ),
+        );
       }),
       child: Container(
         height: 84,
@@ -252,7 +256,12 @@ class _TaskItemState extends State<TaskItem> {
         ),
         child: Row(
           children: [
-            MyCheckBox(value: widget.task.isCompleted),
+            MyCheckBox(
+              value: widget.task.isCompleted,
+              onTap: () => setState(() {
+                widget.task.isCompleted = !widget.task.isCompleted;
+              }),
+            ),
             SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -286,28 +295,34 @@ class _TaskItemState extends State<TaskItem> {
 
 class MyCheckBox extends StatelessWidget {
   final bool value;
+  final GestureTapCallback onTap;
 
-  const MyCheckBox({super.key, required this.value});
+  const MyCheckBox({super.key, required this.value, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
 
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: !value ? Border.all(color: secondaryTextColor, width: 2) : null,
-        color: value ? primaryColor : null,
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: !value
+              ? Border.all(color: secondaryTextColor, width: 2)
+              : null,
+          color: value ? primaryColor : null,
+        ),
+        child: value
+            ? Icon(
+                CupertinoIcons.check_mark,
+                color: themeData.colorScheme.onSecondary,
+                size: 14,
+              )
+            : null,
       ),
-      child: value
-          ? Icon(
-              CupertinoIcons.check_mark,
-              color: themeData.colorScheme.onSecondary,
-              size: 14,
-            )
-          : null,
     );
   }
 }

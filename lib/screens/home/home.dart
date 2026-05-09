@@ -233,6 +233,7 @@ class _TaskItemState extends State<TaskItem> {
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     final Color priorityColor;
+    final taskRepo = Provider.of<Repository<Task>>(context);
 
     switch (widget.task.priority) {
       case Priority.low:
@@ -254,7 +255,7 @@ class _TaskItemState extends State<TaskItem> {
         );
       }),
       onLongPress: () {
-        widget.task.delete();
+        taskRepo.delete(widget.task);
       },
       child: Container(
         height: 84,

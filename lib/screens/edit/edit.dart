@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/data/data.dart';
+import 'package:todo/data/repo/repository.dart';
 import 'package:todo/main.dart';
 
 class EditTaskScreen extends StatefulWidget {
@@ -31,12 +32,11 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           widget.task.name = _controller.text;
-          if (widget.task.isInBox) {
-            widget.task.save();
-          } else {
-            Hive.box<Task>(taskBoxName).add(widget.task);
-          }
-
+          final taskRepo = Provider.of<Repository<Task>>(
+            context,
+            listen: false,
+          );
+          taskRepo.createOrUpdate(widget.task);
           Navigator.of(context).pop();
         },
         label: Row(

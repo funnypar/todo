@@ -38,7 +38,7 @@ class Repository<T> extends ChangeNotifier implements DataSource {
 
   @override
   Future<List<Task>> getAll({String? searchKeyword}) {
-    return dataSource.getAll();
+    return dataSource.getAll(searchKeyword: searchKeyword);
   }
 
   @override

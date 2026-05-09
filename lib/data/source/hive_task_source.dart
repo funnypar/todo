@@ -46,4 +46,9 @@ class HiveTaskDataSource implements DataSource<Task> {
       return box.values.toList();
     }
   }
+
+  @override
+  Future<int> getLengthOfData() async {
+    return box.values.length;
+  }
 }

@@ -1,27 +1,34 @@
+import 'package:flutter/widgets.dart';
+import 'package:todo/data/data.dart';
 import 'package:todo/data/source/source.dart';
 
-class Repository<T> implements DataSource {
+class Repository<T> extends ChangeNotifier implements DataSource {
   final DataSource<T> dataSource;
 
   Repository({required this.dataSource});
   @override
-  Future<dynamic> createOrUpdate(data) {
-    return dataSource.createOrUpdate(data);
+  Future<dynamic> createOrUpdate(data) async {
+    final T result = await dataSource.createOrUpdate(data);
+    notifyListeners();
+    return result;
   }
 
   @override
-  Future<void> delete(data) {
-    return dataSource.delete(data);
+  Future<void> delete(data) async {
+    dataSource.delete(data);
+    notifyListeners();
   }
 
   @override
-  Future<void> deleteAll() {
-    return dataSource.deleteAll();
+  Future<void> deleteAll() async {
+    dataSource.deleteAll();
+    notifyListeners();
   }
 
   @override
-  Future<void> deleteById(id) {
-    return deleteById(id);
+  Future<void> deleteById(id) async {
+    dataSource.deleteById(id);
+    notifyListeners();
   }
 
   @override
@@ -30,7 +37,12 @@ class Repository<T> implements DataSource {
   }
 
   @override
-  Future<List<dynamic>> getAll({String? searchKeyword}) {
+  Future<List<Task>> getAll({String? searchKeyword}) {
     return dataSource.getAll();
+  }
+
+  @override
+  Future<int> getLengthOfData() {
+    return dataSource.getLengthOfData();
   }
 }

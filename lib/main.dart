@@ -60,7 +60,10 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final TextEditingController controller = TextEditingController();
+  final ValueNotifier<String> searchKeywordNotifier = ValueNotifier('');
+
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +134,9 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       child: TextField(
+                        controller: controller,
+                        onChanged: (value) =>
+                            searchKeywordNotifier.value = controller.text,
                         decoration: InputDecoration(
                           prefixIcon: Icon(CupertinoIcons.search),
                           hintText: 'Search Tasks...',
@@ -142,83 +148,100 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ValueListenableBuilder<Box<Task>>(
-                valueListenable: box.listenable(),
-                builder: (context, box, child) {
-                  if (box.isNotEmpty) {
-                    return ListView.builder(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: box.values.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: ValueListenableBuilder<String>(
+                valueListenable: searchKeywordNotifier,
+                builder: (context, value, child) {
+                  return ValueListenableBuilder<Box<Task>>(
+                    valueListenable: box.listenable(),
+                    builder: (context, box, child) {
+                      final items;
+                      if (controller.text.isEmpty) {
+                        items = box.values.toList();
+                      } else {
+                        items = box.values
+                            .where(
+                              (task) => task.name.contains(controller.text),
+                            )
+                            .toList();
+                      }
+                      if (items.isNotEmpty) {
+                        return ListView.builder(
+                          padding: EdgeInsets.fromLTRB(16, 16, 16, 100),
+                          itemCount: items.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      'Today',
-                                      style: themeData.textTheme.titleLarge!
-                                          .apply(fontSizeFactor: 0.9),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Container(
-                                      width: 70,
-                                      height: 3,
-                                      decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius: BorderRadius.circular(
-                                          1.5,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Today',
+                                          style: themeData.textTheme.titleLarge!
+                                              .apply(fontSizeFactor: 0.9),
                                         ),
+                                        SizedBox(height: 4),
+                                        Container(
+                                          width: 70,
+                                          height: 3,
+                                          decoration: BoxDecoration(
+                                            color: primaryColor,
+                                            borderRadius: BorderRadius.circular(
+                                              1.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    MaterialButton(
+                                      color: Color(0xffEAEFF5),
+                                      textColor: secondaryTextColor,
+                                      elevation: 0,
+                                      onPressed: () {
+                                        box.clear();
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Delete All',
+                                            style: TextStyle(
+                                              color: box.values.isNotEmpty
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Icon(
+                                            CupertinoIcons.delete_solid,
+                                            color: box.values.isNotEmpty
+                                                ? Colors.redAccent
+                                                : Colors.grey,
+                                            size: 18,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                                MaterialButton(
-                                  color: Color(0xffEAEFF5),
-                                  textColor: secondaryTextColor,
-                                  elevation: 0,
-                                  onPressed: () {
-                                    box.clear();
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Delete All',
-                                        style: TextStyle(
-                                          color: box.values.isNotEmpty
-                                              ? Colors.black
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Icon(
-                                        CupertinoIcons.delete_solid,
-                                        color: box.values.isNotEmpty
-                                            ? Colors.redAccent
-                                            : Colors.grey,
-                                        size: 18,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          final Task task = box.values.toList()[index - 1];
-                          return TaskItem(task: task);
-                        }
-                      },
-                    );
-                  } else {
-                    return EmptyState();
-                  }
+                              );
+                            } else {
+                              final Task task = items[index - 1];
+                              return TaskItem(task: task);
+                            }
+                          },
+                        );
+                      } else {
+                        return EmptyState();
+                      }
+                    },
+                  );
                 },
               ),
             ),
@@ -294,7 +317,7 @@ class _TaskItemState extends State<TaskItem> {
                 widget.task.name,
                 style: TextStyle(
                   overflow: TextOverflow.ellipsis,
-                  fontSize: 24,
+                  fontSize: 20,
                   decoration: widget.task.isCompleted
                       ? TextDecoration.lineThrough
                       : null,
